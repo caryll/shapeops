@@ -1,6 +1,6 @@
-var Bezier = require('bezier-js');
-var ClipperLib = require('clipper-lib');
-var keyofz = require('./toPoly').keyofz;
+var Bezier = require("bezier-js");
+var ClipperLib = require("clipper-lib");
+var keyofz = require("./toPoly").keyofz;
 
 
 function rebuildShape(polys, recog, pthash, pvhash, RESOLUTION) {
@@ -26,10 +26,10 @@ function ordinalSegPts(poly, l, r, pthash, pvhash) {
 	return pv0;
 }
 function bezpt(Z, RESOLUTION) {
-	return { x: Z.X / RESOLUTION, y: Z.Y / RESOLUTION }
+	return { x: Z.X / RESOLUTION, y: Z.Y / RESOLUTION };
 }
 function rebuildContour(_poly, recog, pthash, pvhash, RESOLUTION) {
-	for (var j0 = 0; j0 < _poly.length && pthash[keyofz(_poly[j0])]; j0++);
+	for (var j0 = 0; j0 < _poly.length && pthash[keyofz(_poly[j0])]; j0++) { }
 	var poly = _poly.slice(j0).concat(_poly.slice(0, j0 + 1));
 	var j = 0;
 	var ans = [];
@@ -38,7 +38,7 @@ function rebuildContour(_poly, recog, pthash, pvhash, RESOLUTION) {
 		while (n < poly.length && pthash[keyofz(poly[n])]) n++;
 		if (n < poly.length) {
 			var pv = ordinalSegPts(poly, j, n, pthash, pvhash, RESOLUTION);
-			//pv = null;
+			// pv = null;
 			if (pv) {
 				var seg = recog[pv[0]][pv[1]][pv[2]];
 				var z1 = bezpt(poly[j], RESOLUTION);

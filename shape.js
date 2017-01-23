@@ -1,7 +1,7 @@
-var Bezier = require('bezier-js');
+var Bezier = require("bezier-js");
 
 function lerp(l, r, x) { return l + (r - l) * x; }
-function contourZsToBeziers(contour) {
+function contourZsToBeziers(contour, resolution) {
 	var ans = [];
 	var z0 = contour[0];
 	for (var j = 1; j < contour.length; j++) {
@@ -35,7 +35,7 @@ function zsToBeziers(shape) {
 exports.zsToBeziers = zsToBeziers;
 
 function reduceContour(contour) {
-	var ans = []
+	var ans = [];
 	for (var j = 0; j < contour.length; j++) {
 		var seg = contour[j];
 		if (seg._linear) {
@@ -58,6 +58,7 @@ function reduceContour(contour) {
 	return ans;
 }
 function reduceShape(shape) {
+	return shape;
 	return shape.map(reduceContour);
 }
 exports.reduceShape = reduceShape;
@@ -70,7 +71,7 @@ function onpoint(z) {
 		x: z.x,
 		y: z.y,
 		on: true
-	}
+	};
 }
 function offpoint(z) {
 	return {
@@ -78,19 +79,19 @@ function offpoint(z) {
 		y: z.y,
 		on: false,
 		cubic: true
-	}
+	};
 }
 function contourBeziersToZs(contour) {
 	var ans = [onpoint(contour[0].points[0])];
 	for (var j = 0; j < contour.length; j++) {
 		if (contour[j]._linear) {
-			ans.push(onpoint(contour[j].points[3]))
+			ans.push(onpoint(contour[j].points[3]));
 		} else {
 			ans.push(
 				offpoint(contour[j].points[1]),
 				offpoint(contour[j].points[2]),
 				onpoint(contour[j].points[3])
-			)
+			);
 		}
 	}
 	return ans;

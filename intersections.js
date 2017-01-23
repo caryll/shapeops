@@ -1,4 +1,4 @@
-var Bezier = require('bezier-js');
+var Bezier = require("bezier-js");
 
 // Cache bounding boxes
 function bez3bbox(x0, y0, x1, y1, x2, y2, x3, y3) {
@@ -53,11 +53,11 @@ function bez3bbox(x0, y0, x1, y1, x2, y2, x3, y3) {
 	return {
 		x: { mid: (xmax + xmin) / 2, size: xmax - xmin },
 		y: { mid: (ymax + ymin) / 2, size: ymax - ymin }
-	}
+	};
 }
 function bboxof(c) {
 	if (c.__caryll_bbox) {
-		return c.__caryll_bbox
+		return c.__caryll_bbox;
 	} else {
 		c.__caryll_bbox = bez3bbox(
 			c.points[0].x, c.points[0].y,
@@ -69,34 +69,37 @@ function bboxof(c) {
 	}
 }
 function bboxOverlap(b1, b2) {
-	var l, t, d;
-	{
-		l = b1.x.mid;
-		t = b2.x.mid;
-		d = (b1.x.size + b2.x.size) / 2;
-		if (Math.abs(l - t) >= d) return false;
-	} {
-		l = b1.y.mid;
-		t = b2.y.mid;
-		d = (b1.y.size + b2.y.size) / 2;
-		if (Math.abs(l - t) >= d) return false;
-	}
+	if (b1.x.mid + b1.x.size / 2 < b2.x.mid - b2.x.size / 2) return false;
+	if (b1.x.mid - b1.x.size / 2 > b2.x.mid + b2.x.size / 2) return false;
+	if (b1.y.mid + b1.y.size / 2 < b2.y.mid - b2.y.size / 2) return false;
+	if (b1.y.mid - b1.y.size / 2 > b2.y.mid + b2.y.size / 2) return false;
 	return true;
 }
-function pairIteration(c1, c2, curveIntersectionThreshold, results) {
+
+var PHI = (Math.sqrt(5) - 1) / 2;
+function zcolinear(z1, z2, z3, threshold) {
+	return Math.abs(z1.x * z2.y + z2.x * z3.y + z3.x * z1.y - z1.x * z3.y - z2.x * z1.y - z3.x * z2.y) <= threshold;
+}
+function ccolinear(c1, c2, threshold) {
+	return zcolinear(c1.points[0], c1.points[3], c2.points[0], threshold) && zcolinear(c1.points[0], c1.points[3], c2.points[3], threshold);
+}
+
+function pairIteration(c1, c2, curveIntersectionThreshold, depth, results) {
 	var c1b = bboxof(c1), c2b = bboxof(c2), r = 100000, threshold = curveIntersectionThreshold || 0.5;
-	if (c1b.x.size + c1b.y.size < threshold && c2b.x.size + c2b.y.size < threshold) {
+	if (!bboxOverlap(c1b, c2b)) return results;
+	//	if (c1b.x.size < threshold && c2b.x.size < threshold) return results;
+	//	if (c1b.y.size < threshold && c2b.y.size < threshold) return results;
+	if (c1._linear && c2._linear) return results;
+	if (depth > 20 || c1b.x.size < threshold && c1b.y.size < threshold || c2b.x.size < threshold && c2b.y.size < threshold) {
 		results.push([((r * (c1._t1 + c1._t2) / 2) | 0) / r, ((r * (c2._t1 + c2._t2) / 2) | 0) / r]);
 		return results;
 	}
-	var cc1 = c1.split(0.5), cc2 = c2.split(0.5), pairs = [];
-	var cb1l = bboxof(cc1.left), cb1r = bboxof(cc1.right);
-	var cb2l = bboxof(cc2.left), cb2r = bboxof(cc2.right);
+	var cc1 = c1.split(PHI), cc2 = c2.split(PHI), pairs = [];
 
-	if (bboxOverlap(cb1l, cb2l)) pairIteration(cc1.left, cc2.left, threshold, results);
-	if (bboxOverlap(cb1r, cb2l)) pairIteration(cc1.right, cc2.left, threshold, results);
-	if (bboxOverlap(cb1l, cb2r)) pairIteration(cc1.left, cc2.right, threshold, results);
-	if (bboxOverlap(cb1r, cb2r)) pairIteration(cc1.right, cc2.right, threshold, results);
+	pairIteration(cc1.left, cc2.left, threshold, depth + 1, results);
+	pairIteration(cc1.right, cc2.left, threshold, depth + 1, results);
+	pairIteration(cc1.left, cc2.right, threshold, depth + 1, results);
+	pairIteration(cc1.right, cc2.right, threshold, depth + 1, results);
 	return results;
 }
 function curveIntersects(c1, c2, curveIntersectionThreshold) {
@@ -106,15 +109,16 @@ function curveIntersects(c1, c2, curveIntersectionThreshold) {
 	var b2 = [];
 	for (var j = 0; j < c1.length; j++) { b1[j] = bboxof(c1[j]); }
 	for (var j = 0; j < c2.length; j++) { b2[j] = bboxof(c2[j]); }
-	for (var j = 0; j < c1.length; j++) for (var k = 0; k < c2.length; k++) {
-		if (bboxOverlap(b1[j], b2[k])) {
-			pairs.push({ left: c1[j], right: c2[k] });
+	for (var j = 0; j < c1.length; j++) { for (var k = 0; k < c2.length; k++) {
+			if (bboxOverlap(b1[j], b2[k])) {
+				pairs.push({ left: c1[j], right: c2[k]});
+			}
 		}
 	}
 	// step 2: for each pairing, run through the convergence algorithm.
 	var intersections = [];
 	pairs.forEach(function (pair) {
-		var result = pairIteration(pair.left, pair.right, curveIntersectionThreshold, []);
+		var result = pairIteration(pair.left, pair.right, curveIntersectionThreshold, 0, []);
 		if (result.length > 0) {
 			intersections = intersections.concat(result);
 		}
@@ -136,19 +140,19 @@ function findAllSelfIntersections(shape, origshape, ERROR) {
 		for (var j = 0; j <= origshape[c].length; j++) {
 			results.push([j]);
 		}
-		ans.push(results.reduce(function (a, b) { return a.concat(b) }, []));
+		ans.push(results.reduce(function (a, b) { return a.concat(b); }, []));
 	}
 	return ans;
 }
 
-function FIRST(x) { return x[0] }
-function SECOND(x) { return x[1] }
+function FIRST(x) { return x[0]; }
+function SECOND(x) { return x[1]; }
 function findCrossIntersections(shape1, shape2, i1, i2, notsame, ERROR) {
 	for (var c = 0; c < shape1.length; c++) for (var d = 0; d < shape2.length; d++) if (!notsame || c < d) {
-		var l = shape1[c], r = shape2[d];
-		var intersections = curveIntersects(l, r, ERROR);
-		i1[c] = i1[c].concat(intersections.map(FIRST));
-		i2[d] = i2[d].concat(intersections.map(SECOND));
+				var l = shape1[c], r = shape2[d];
+				var intersections = curveIntersects(l, r, ERROR);
+				i1[c] = i1[c].concat(intersections.map(FIRST));
+				i2[d] = i2[d].concat(intersections.map(SECOND));
 	}
 }
 
@@ -172,7 +176,7 @@ function splitContour(contour, irec, ERROR) {
 			ans.push(contour[jc].split(tlast, t));
 			z0 = pt;
 			if (t < 1) {
-				tlast = t
+				tlast = t;
 			} else {
 				tlast = 0;
 				jc += 1;

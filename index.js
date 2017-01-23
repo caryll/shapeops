@@ -1,26 +1,26 @@
-var Bezier = require('bezier-js');
-var ClipperLib = require('clipper-lib');
+var Bezier = require("bezier-js");
+var ClipperLib = require("clipper-lib");
 
-var zsToBeziers = require('./shape').zsToBeziers;
-var reduceShape = require('./shape').reduceShape;
-var beziersToZs = require('./shape').beziersToZs;
-var findAllSelfIntersections = require('./intersections').findAllSelfIntersections;
-var findCrossIntersections = require('./intersections').findCrossIntersections;
-var splitShape = require('./intersections').splitShape;
-var keyofz = require('./toPoly').keyofz;
-var toPoly = require('./toPoly').toPoly;
-var rebuildShape = require('./rebuild').rebuildShape;
+var zsToBeziers = require("./shape").zsToBeziers;
+var reduceShape = require("./shape").reduceShape;
+var beziersToZs = require("./shape").beziersToZs;
+var findAllSelfIntersections = require("./intersections").findAllSelfIntersections;
+var findCrossIntersections = require("./intersections").findCrossIntersections;
+var splitShape = require("./intersections").splitShape;
+var keyofz = require("./toPoly").keyofz;
+var toPoly = require("./toPoly").toPoly;
+var rebuildShape = require("./rebuild").rebuildShape;
 
-function by_t(a, b) { return a - b }
+function by_t(a, b) { return a - b; }
 
-function boolop(op, zs1, zs2, rule1, rule2, resolution) {
+function boolop(op, zs1, zs2, rule1, rule2, resolution, dontreduce) {
 	var RESOLUTION = resolution || 100;
 	var ERROR = 0.5 / RESOLUTION;
 
 	var ss1 = zsToBeziers(zs1);
 	var ss2 = zsToBeziers(zs2);
-	var s1 = reduceShape(ss1);
-	var s2 = reduceShape(ss2);
+	var s1 = dontreduce ? ss1 : reduceShape(ss1);
+	var s2 = dontreduce ? ss2 : reduceShape(ss2);
 	var i1 = findAllSelfIntersections(s1, ss1, ERROR);
 	var i2 = findAllSelfIntersections(s2, ss2, ERROR);
 	findCrossIntersections(s1, s1, i1, i1, true, ERROR);
@@ -47,12 +47,12 @@ function boolop(op, zs1, zs2, rule1, rule2, resolution) {
 	return beziersToZs(result);
 }
 
-function removeOverlap(zs1, rule, resolution) {
+function removeOverlap(zs1, rule, resolution, dontreduce) {
 	var RESOLUTION = resolution || 100;
 	var ERROR = 0.5 / RESOLUTION;
 
 	var ss1 = zsToBeziers(zs1);
-	var s1 = reduceShape(ss1);
+	var s1 = dontreduce ? ss1 : reduceShape(ss1);
 	var i1 = findAllSelfIntersections(s1, ss1, ERROR);
 	findCrossIntersections(s1, s1, i1, i1, true, ERROR);
 	for (var c = 0; c < i1.length; c++) { i1[c] = i1[c].sort(by_t); }
@@ -73,8 +73,8 @@ exports.ops = {
 	intersection: 0,
 	union: 1,
 	difference: 2
-}
+};
 exports.fillRules = {
 	evenodd: 0,
 	nonzero: 1
-}
+};

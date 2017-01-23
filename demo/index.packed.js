@@ -1,16 +1,17 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var lib = require('../index');
+var lib = require("../index");
 
 function drawShape(hDC, shape, color, fcolor) {
+	console.log(shape);
 	hDC.save();
-	hDC.translate(500, 500);
-	hDC.scale(2, -2);
+	hDC.translate(200, 800);
+	hDC.scale(1, -1);
 	hDC.strokeStyle = color;
 	hDC.fillStyle = fcolor;
 	hDC.beginPath();
 	for (var c = 0; c < shape.length; c++) {
 		var contour = shape[c];
-		hDC.moveTo(contour[0].x, contour[0].y)
+		hDC.moveTo(contour[0].x, contour[0].y);
 		for (var j = 0; j < contour.length; j++) {
 			var z1 = contour[j % contour.length];
 			if (z1.on) {
@@ -22,7 +23,7 @@ function drawShape(hDC, shape, color, fcolor) {
 				j += 2;
 			}
 		}
-		hDC.lineTo(contour[0].x, contour[0].y)
+		hDC.lineTo(contour[0].x, contour[0].y);
 	}
 	hDC.stroke();
 	hDC.fill();
@@ -32,16 +33,16 @@ function drawShape(hDC, shape, color, fcolor) {
 		for (var j = 0; j < contour.length; j++) {
 			var z1 = contour[j % contour.length];
 			hDC.fillStyle = j === 0 ? color : "white";
-			if (z1.on) {
-				hDC.strokeRect(z1.x - 1, z1.y - 1, 2, 2);
-				hDC.fillRect(z1.x - 1, z1.y - 1, 2, 2);
-			}
+			//	if (z1.on) {
+			hDC.strokeRect(z1.x - 1, z1.y - 1, 2, 2);
+			hDC.fillRect(z1.x - 1, z1.y - 1, 2, 2);
+		//	}
 		}
 	}
 	hDC.restore();
 }
 
-var hDC = document.getElementById('out').getContext('2d');
+var hDC = document.getElementById("out").getContext("2d");
 
 function randcoord(c) {
 	return Math.round(Math.random() * 100 - 50 + c);
@@ -51,19 +52,41 @@ function randshape(n, m) {
 	for (var c = 0; c < n; c++) {
 		var cx = randcoord(0) * 5;
 		var cy = randcoord(0) * 5;
-		var contour = [{ x: randcoord(cx), y: randcoord(cy), on: true }];
+		var contour = [{
+			x: randcoord(cx),
+			y: randcoord(cy),
+			on: true
+		}];
 		for (var j = 0; j < m; j++) {
 			var curve = Math.random() < 0.5;
 			if (curve) {
 				contour.push(
-					{ x: randcoord(cx), y: randcoord(cy), on: false, cubic: true },
-					{ x: randcoord(cx), y: randcoord(cy), on: false, cubic: true },
-					{ x: randcoord(cx), y: randcoord(cy), on: true }
-				)
+					{
+						x: randcoord(cx),
+						y: randcoord(cy),
+						on: false,
+						cubic: true
+					},
+					{
+						x: randcoord(cx),
+						y: randcoord(cy),
+						on: false,
+						cubic: true
+					},
+					{
+						x: randcoord(cx),
+						y: randcoord(cy),
+						on: true
+					}
+				);
 			} else {
 				contour.push(
-					{ x: randcoord(cx), y: randcoord(cy), on: true }
-				)
+					{
+						x: randcoord(cx),
+						y: randcoord(cy),
+						on: true
+					}
+				);
 			}
 		}
 		contour.push(contour[0]);
@@ -72,37 +95,39 @@ function randshape(n, m) {
 	return out;
 }
 
-var in1 = randshape(3, 15);
+var in1 = [[{"x": 54.440652041410274,"y": 0,"on": true}, {"x": 54.44065204141029,"y": 735,"on": true}, {"x": 74.68792686522303,"y": 735,"on": true}, {"x": 74.68792686522303,"y": 0,"on": true}, {"x": 54.440652041410274,"y": 0,"on": true}], [{"x": 62.44065204141029,"y": 735,"on": true}, {"x": 356.4406520414102,"y": 735,"on": true}, {"x": 356.4406520414102,"y": 717,"on": true}, {"x": 62.4406520414103,"y": 717,"on": true}, {"x": 62.44065204141029,"y": 735,"on": true}], [{"x": 62.440652041410274,"y": 391.2,"on": true}, {"x": 300.7006520414102,"y": 391.2,"on": true}, {"x": 300.7006520414102,"y": 373.2,"on": true}, {"x": 62.4406520414103,"y": 373.2,"on": true}, {"x": 62.440652041410274,"y": 391.2,"on": true}], [{"x": 64.56428945331668,"y": 717,"on": true}, {"x": -19.166156285582375,"y": 717,"on": true}, {"x": -22.340041938334736,"y": 735,"on": true}, {"x": 64.56428945331666,"y": 735,"on": true}, {"x": 64.56428945331668,"y": 717,"on": true}], [{"x": 151.4686208449681,"y": 0,"on": true}, {"x": -18.531379155031914,"y": 0,"on": true}, {"x": -21.705264807784282,"y": 18,"on": true}, {"x": 148.2947351922157,"y": 18,"on": true}, {"x": 151.4686208449681,"y": 0,"on": true}], [{"x": 356.4406520414103,"y": 735,"on": true}, {"x": 356.4406520414102,"y": 590,"on": true}, {"x": 336.19337721759746,"y": 590,"on": true}, {"x": 336.1933772175976,"y": 735,"on": true}, {"x": 356.4406520414103,"y": 735,"on": true}], [{"x": 62.44065204141027,"y": 18,"on": true}, {"x": 356.4406520414102,"y": 18,"on": true}, {"x": 356.4406520414102,"y": 0,"on": true}, {"x": 62.440652041410274,"y": 0,"on": true}, {"x": 62.44065204141027,"y": 18,"on": true}], [{"x": 64.56428945331666,"y": 0,"on": true}, {"x": -18.5313791550319,"y": 0,"on": true}, {"x": -21.705264807784268,"y": 18,"on": true}, {"x": 64.56428945331666,"y": 18,"on": true}, {"x": 64.56428945331666,"y": 0,"on": true}], [{"x": 336.1933772175976,"y": 0,"on": true}, {"x": 336.1933772175975,"y": 145,"on": true}, {"x": 356.44065204141026,"y": 145,"on": true}, {"x": 356.4406520414103,"y": 0,"on": true}, {"x": 336.1933772175976,"y": 0,"on": true}]];
 var in2 = randshape(3, 15);
-drawShape(hDC, in1, 'transparent', 'rgba(255, 0, 0, 0.05)');
-drawShape(hDC, in2, 'transparent', 'rgba(0, 255, 0, 0.05)');
-//var result = lib.removeOverlap(in1, 1);
-var result = lib.boolop(1, in1, in2, 1, 1);
-drawShape(hDC, result, 'black', 'transparent');
+drawShape(hDC, in1, "blue", "rgba(255, 0, 0, 0.05)");
+drawShape(hDC, in2, "transparent", "rgba(0, 255, 0, 0.05)");
+debugger;
+var result = lib.removeOverlap(in1, 1, 1000);
+// var result = lib.boole(1, in1, in2, 1, 1);
+drawShape(hDC, result, "black", "transparent");
+
 },{"../index":2}],2:[function(require,module,exports){
-var Bezier = require('bezier-js');
-var ClipperLib = require('clipper-lib');
+var Bezier = require("bezier-js");
+var ClipperLib = require("clipper-lib");
 
-var zsToBeziers = require('./shape').zsToBeziers;
-var reduceShape = require('./shape').reduceShape;
-var beziersToZs = require('./shape').beziersToZs;
-var findAllSelfIntersections = require('./intersections').findAllSelfIntersections;
-var findCrossIntersections = require('./intersections').findCrossIntersections;
-var splitShape = require('./intersections').splitShape;
-var keyofz = require('./toPoly').keyofz;
-var toPoly = require('./toPoly').toPoly;
-var rebuildShape = require('./rebuild').rebuildShape;
+var zsToBeziers = require("./shape").zsToBeziers;
+var reduceShape = require("./shape").reduceShape;
+var beziersToZs = require("./shape").beziersToZs;
+var findAllSelfIntersections = require("./intersections").findAllSelfIntersections;
+var findCrossIntersections = require("./intersections").findCrossIntersections;
+var splitShape = require("./intersections").splitShape;
+var keyofz = require("./toPoly").keyofz;
+var toPoly = require("./toPoly").toPoly;
+var rebuildShape = require("./rebuild").rebuildShape;
 
-function by_t(a, b) { return a - b }
+function by_t(a, b) { return a - b; }
 
-function boolop(op, zs1, zs2, rule1, rule2, resolution) {
+function boolop(op, zs1, zs2, rule1, rule2, resolution, dontreduce) {
 	var RESOLUTION = resolution || 100;
 	var ERROR = 0.5 / RESOLUTION;
 
 	var ss1 = zsToBeziers(zs1);
 	var ss2 = zsToBeziers(zs2);
-	var s1 = reduceShape(ss1);
-	var s2 = reduceShape(ss2);
+	var s1 = dontreduce ? ss1 : reduceShape(ss1);
+	var s2 = dontreduce ? ss2 : reduceShape(ss2);
 	var i1 = findAllSelfIntersections(s1, ss1, ERROR);
 	var i2 = findAllSelfIntersections(s2, ss2, ERROR);
 	findCrossIntersections(s1, s1, i1, i1, true, ERROR);
@@ -129,12 +154,12 @@ function boolop(op, zs1, zs2, rule1, rule2, resolution) {
 	return beziersToZs(result);
 }
 
-function removeOverlap(zs1, rule, resolution) {
+function removeOverlap(zs1, rule, resolution, dontreduce) {
 	var RESOLUTION = resolution || 100;
 	var ERROR = 0.5 / RESOLUTION;
 
 	var ss1 = zsToBeziers(zs1);
-	var s1 = reduceShape(ss1);
+	var s1 = dontreduce ? ss1 : reduceShape(ss1);
 	var i1 = findAllSelfIntersections(s1, ss1, ERROR);
 	findCrossIntersections(s1, s1, i1, i1, true, ERROR);
 	for (var c = 0; c < i1.length; c++) { i1[c] = i1[c].sort(by_t); }
@@ -149,10 +174,20 @@ function removeOverlap(zs1, rule, resolution) {
 	return beziersToZs(result);
 }
 
-exports.boolop = boolop;
+exports.boole = boolop;
 exports.removeOverlap = removeOverlap;
+exports.ops = {
+	intersection: 0,
+	union: 1,
+	difference: 2
+};
+exports.fillRules = {
+	evenodd: 0,
+	nonzero: 1
+};
+
 },{"./intersections":3,"./rebuild":9,"./shape":10,"./toPoly":11,"bezier-js":4,"clipper-lib":8}],3:[function(require,module,exports){
-var Bezier = require('bezier-js');
+var Bezier = require("bezier-js");
 
 // Cache bounding boxes
 function bez3bbox(x0, y0, x1, y1, x2, y2, x3, y3) {
@@ -207,11 +242,11 @@ function bez3bbox(x0, y0, x1, y1, x2, y2, x3, y3) {
 	return {
 		x: { mid: (xmax + xmin) / 2, size: xmax - xmin },
 		y: { mid: (ymax + ymin) / 2, size: ymax - ymin }
-	}
+	};
 }
 function bboxof(c) {
 	if (c.__caryll_bbox) {
-		return c.__caryll_bbox
+		return c.__caryll_bbox;
 	} else {
 		c.__caryll_bbox = bez3bbox(
 			c.points[0].x, c.points[0].y,
@@ -223,34 +258,37 @@ function bboxof(c) {
 	}
 }
 function bboxOverlap(b1, b2) {
-	var l, t, d;
-	{
-		l = b1.x.mid;
-		t = b2.x.mid;
-		d = (b1.x.size + b2.x.size) / 2;
-		if (Math.abs(l - t) >= d) return false;
-	} {
-		l = b1.y.mid;
-		t = b2.y.mid;
-		d = (b1.y.size + b2.y.size) / 2;
-		if (Math.abs(l - t) >= d) return false;
-	}
+	if (b1.x.mid + b1.x.size / 2 < b2.x.mid - b2.x.size / 2) return false;
+	if (b1.x.mid - b1.x.size / 2 > b2.x.mid + b2.x.size / 2) return false;
+	if (b1.y.mid + b1.y.size / 2 < b2.y.mid - b2.y.size / 2) return false;
+	if (b1.y.mid - b1.y.size / 2 > b2.y.mid + b2.y.size / 2) return false;
 	return true;
 }
-function pairIteration(c1, c2, curveIntersectionThreshold, results) {
+
+var PHI = (Math.sqrt(5) - 1) / 2;
+function zcolinear(z1, z2, z3, threshold) {
+	return Math.abs(z1.x * z2.y + z2.x * z3.y + z3.x * z1.y - z1.x * z3.y - z2.x * z1.y - z3.x * z2.y) <= threshold;
+}
+function ccolinear(c1, c2, threshold) {
+	return zcolinear(c1.points[0], c1.points[3], c2.points[0], threshold) && zcolinear(c1.points[0], c1.points[3], c2.points[3], threshold);
+}
+
+function pairIteration(c1, c2, curveIntersectionThreshold, depth, results) {
 	var c1b = bboxof(c1), c2b = bboxof(c2), r = 100000, threshold = curveIntersectionThreshold || 0.5;
-	if (c1b.x.size + c1b.y.size < threshold && c2b.x.size + c2b.y.size < threshold) {
+	if (!bboxOverlap(c1b, c2b)) return results;
+	if (c1b.x.size < threshold && c2b.x.size < threshold) return results;
+	if (c1b.y.size < threshold && c2b.y.size < threshold) return results;
+	if (c1._linear && c2._linear && ccolinear(c1, c2, threshold)) return results;
+	if (depth > 8 || c1b.x.size < threshold && c1b.y.size < threshold || c2b.x.size < threshold && c2b.y.size < threshold) {
 		results.push([((r * (c1._t1 + c1._t2) / 2) | 0) / r, ((r * (c2._t1 + c2._t2) / 2) | 0) / r]);
 		return results;
 	}
-	var cc1 = c1.split(0.5), cc2 = c2.split(0.5), pairs = [];
-	var cb1l = bboxof(cc1.left), cb1r = bboxof(cc1.right);
-	var cb2l = bboxof(cc2.left), cb2r = bboxof(cc2.right);
+	var cc1 = c1.split(PHI), cc2 = c2.split(PHI), pairs = [];
 
-	if (bboxOverlap(cb1l, cb2l)) pairIteration(cc1.left, cc2.left, threshold, results);
-	if (bboxOverlap(cb1r, cb2l)) pairIteration(cc1.right, cc2.left, threshold, results);
-	if (bboxOverlap(cb1l, cb2r)) pairIteration(cc1.left, cc2.right, threshold, results);
-	if (bboxOverlap(cb1r, cb2r)) pairIteration(cc1.right, cc2.right, threshold, results);
+	pairIteration(cc1.left, cc2.left, threshold, depth + 1, results);
+	pairIteration(cc1.right, cc2.left, threshold, depth + 1, results);
+	pairIteration(cc1.left, cc2.right, threshold, depth + 1, results);
+	pairIteration(cc1.right, cc2.right, threshold, depth + 1, results);
 	return results;
 }
 function curveIntersects(c1, c2, curveIntersectionThreshold) {
@@ -260,15 +298,16 @@ function curveIntersects(c1, c2, curveIntersectionThreshold) {
 	var b2 = [];
 	for (var j = 0; j < c1.length; j++) { b1[j] = bboxof(c1[j]); }
 	for (var j = 0; j < c2.length; j++) { b2[j] = bboxof(c2[j]); }
-	for (var j = 0; j < c1.length; j++) for (var k = 0; k < c2.length; k++) {
-		if (bboxOverlap(b1[j], b2[k])) {
-			pairs.push({ left: c1[j], right: c2[k] });
+	for (var j = 0; j < c1.length; j++) { for (var k = 0; k < c2.length; k++) {
+			if (bboxOverlap(b1[j], b2[k])) {
+				pairs.push({ left: c1[j], right: c2[k]});
+			}
 		}
 	}
 	// step 2: for each pairing, run through the convergence algorithm.
 	var intersections = [];
 	pairs.forEach(function (pair) {
-		var result = pairIteration(pair.left, pair.right, curveIntersectionThreshold, []);
+		var result = pairIteration(pair.left, pair.right, curveIntersectionThreshold, 0, []);
 		if (result.length > 0) {
 			intersections = intersections.concat(result);
 		}
@@ -290,19 +329,19 @@ function findAllSelfIntersections(shape, origshape, ERROR) {
 		for (var j = 0; j <= origshape[c].length; j++) {
 			results.push([j]);
 		}
-		ans.push(results.reduce(function (a, b) { return a.concat(b) }, []));
+		ans.push(results.reduce(function (a, b) { return a.concat(b); }, []));
 	}
 	return ans;
 }
 
-function FIRST(x) { return x[0] }
-function SECOND(x) { return x[1] }
+function FIRST(x) { return x[0]; }
+function SECOND(x) { return x[1]; }
 function findCrossIntersections(shape1, shape2, i1, i2, notsame, ERROR) {
 	for (var c = 0; c < shape1.length; c++) for (var d = 0; d < shape2.length; d++) if (!notsame || c < d) {
-		var l = shape1[c], r = shape2[d];
-		var intersections = curveIntersects(l, r, ERROR);
-		i1[c] = i1[c].concat(intersections.map(FIRST));
-		i2[d] = i2[d].concat(intersections.map(SECOND));
+				var l = shape1[c], r = shape2[d];
+				var intersections = curveIntersects(l, r, ERROR);
+				i1[c] = i1[c].concat(intersections.map(FIRST));
+				i2[d] = i2[d].concat(intersections.map(SECOND));
 	}
 }
 
@@ -326,7 +365,7 @@ function splitContour(contour, irec, ERROR) {
 			ans.push(contour[jc].split(tlast, t));
 			z0 = pt;
 			if (t < 1) {
-				tlast = t
+				tlast = t;
 			} else {
 				tlast = 0;
 				jc += 1;
@@ -345,6 +384,7 @@ function splitContour(contour, irec, ERROR) {
 exports.findAllSelfIntersections = findAllSelfIntersections;
 exports.findCrossIntersections = findCrossIntersections;
 exports.splitShape = splitShape;
+
 },{"bezier-js":4}],4:[function(require,module,exports){
 module.exports = require('./lib/bezier');
 
@@ -8801,9 +8841,9 @@ module.exports = require('./lib/bezier');
 })(this);
 
 },{}],9:[function(require,module,exports){
-var Bezier = require('bezier-js');
-var ClipperLib = require('clipper-lib');
-var keyofz = require('./toPoly').keyofz;
+var Bezier = require("bezier-js");
+var ClipperLib = require("clipper-lib");
+var keyofz = require("./toPoly").keyofz;
 
 
 function rebuildShape(polys, recog, pthash, pvhash, RESOLUTION) {
@@ -8829,10 +8869,10 @@ function ordinalSegPts(poly, l, r, pthash, pvhash) {
 	return pv0;
 }
 function bezpt(Z, RESOLUTION) {
-	return { x: Z.X / RESOLUTION, y: Z.Y / RESOLUTION }
+	return { x: Z.X / RESOLUTION, y: Z.Y / RESOLUTION };
 }
 function rebuildContour(_poly, recog, pthash, pvhash, RESOLUTION) {
-	for (var j0 = 0; j0 < _poly.length && pthash[keyofz(_poly[j0])]; j0++);
+	for (var j0 = 0; j0 < _poly.length && pthash[keyofz(_poly[j0])]; j0++) { }
 	var poly = _poly.slice(j0).concat(_poly.slice(0, j0 + 1));
 	var j = 0;
 	var ans = [];
@@ -8841,7 +8881,7 @@ function rebuildContour(_poly, recog, pthash, pvhash, RESOLUTION) {
 		while (n < poly.length && pthash[keyofz(poly[n])]) n++;
 		if (n < poly.length) {
 			var pv = ordinalSegPts(poly, j, n, pthash, pvhash, RESOLUTION);
-			//pv = null;
+			// pv = null;
 			if (pv) {
 				var seg = recog[pv[0]][pv[1]][pv[2]];
 				var z1 = bezpt(poly[j], RESOLUTION);
@@ -8880,11 +8920,12 @@ function rebuildContour(_poly, recog, pthash, pvhash, RESOLUTION) {
 }
 
 exports.rebuildShape = rebuildShape;
+
 },{"./toPoly":11,"bezier-js":4,"clipper-lib":8}],10:[function(require,module,exports){
-var Bezier = require('bezier-js');
+var Bezier = require("bezier-js");
 
 function lerp(l, r, x) { return l + (r - l) * x; }
-function contourZsToBeziers(contour) {
+function contourZsToBeziers(contour, resolution) {
 	var ans = [];
 	var z0 = contour[0];
 	for (var j = 1; j < contour.length; j++) {
@@ -8918,7 +8959,7 @@ function zsToBeziers(shape) {
 exports.zsToBeziers = zsToBeziers;
 
 function reduceContour(contour) {
-	var ans = []
+	var ans = [];
 	for (var j = 0; j < contour.length; j++) {
 		var seg = contour[j];
 		if (seg._linear) {
@@ -8941,6 +8982,7 @@ function reduceContour(contour) {
 	return ans;
 }
 function reduceShape(shape) {
+	return shape;
 	return shape.map(reduceContour);
 }
 exports.reduceShape = reduceShape;
@@ -8953,7 +8995,7 @@ function onpoint(z) {
 		x: z.x,
 		y: z.y,
 		on: true
-	}
+	};
 }
 function offpoint(z) {
 	return {
@@ -8961,29 +9003,30 @@ function offpoint(z) {
 		y: z.y,
 		on: false,
 		cubic: true
-	}
+	};
 }
 function contourBeziersToZs(contour) {
 	var ans = [onpoint(contour[0].points[0])];
 	for (var j = 0; j < contour.length; j++) {
 		if (contour[j]._linear) {
-			ans.push(onpoint(contour[j].points[3]))
+			ans.push(onpoint(contour[j].points[3]));
 		} else {
 			ans.push(
 				offpoint(contour[j].points[1]),
 				offpoint(contour[j].points[2]),
 				onpoint(contour[j].points[3])
-			)
+			);
 		}
 	}
 	return ans;
 }
 exports.beziersToZs = beziersToZs;
+
 },{"bezier-js":4}],11:[function(require,module,exports){
-var Bezier = require('bezier-js');
+var Bezier = require("bezier-js");
 
 function keyofz(z) {
-	return 'X' + z.X + 'Y' + z.Y;
+	return "X" + z.X + "Y" + z.Y;
 }
 function toPoly(shape, sindex, pthash, pvhash, RESOLUTION) {
 	var ans = [];
@@ -8991,14 +9034,30 @@ function toPoly(shape, sindex, pthash, pvhash, RESOLUTION) {
 		var points = [];
 		var contour = shape[j];
 		for (var k = 0; k < contour.length; k++) {
+			if (contour[k]._linear) {
+				var X = Math.round(contour[k].points[0].x * RESOLUTION);
+				var Y = Math.round(contour[k].points[0].y * RESOLUTION);
+				var z = { X: X, Y: Y };
+				var zk = keyofz(z);
+				pthash[zk] = 0;
+				points.push(z);
+
+				X = Math.round(contour[k].points[3].x * RESOLUTION);
+				Y = Math.round(contour[k].points[3].y * RESOLUTION);
+				z = { X: X, Y: Y };
+				zk = keyofz(z);
+				pthash[zk] = 0;
+				points.push(z);
+				continue;
+			}
 			var segpts = contour[k].getLUT(Math.max(5, Math.ceil(contour[k].length() / 5))).map(function (z) {
 				var X = Math.round(z.x * RESOLUTION);
 				var Y = Math.round(z.y * RESOLUTION);
-				return { X: X, Y: Y }
+				return { X: X, Y: Y };
 			});
 			for (var m = 0; m < segpts.length; m++) {
 				var zk = keyofz(segpts[m]);
-				var isMid = m > 0 && m < segpts.length - 1
+				var isMid = m > 0 && m < segpts.length - 1;
 				if (isMid) {
 					pthash[zk] = pthash[zk] === 0 ? 0 : 1;
 					if (pthash[zk]) pvhash[zk] = [sindex, j, k, m];
@@ -9015,4 +9074,5 @@ function toPoly(shape, sindex, pthash, pvhash, RESOLUTION) {
 
 exports.keyofz = keyofz;
 exports.toPoly = toPoly;
+
 },{"bezier-js":4}]},{},[1]);

@@ -32,11 +32,14 @@ function drawShape(hDC, shape, color, fcolor) {
 		var contour = shape[c];
 		for (var j = 0; j < contour.length; j++) {
 			var z1 = contour[j % contour.length];
-			hDC.fillStyle = j === 0 ? color : "white";
-			//	if (z1.on) {
-			hDC.strokeRect(z1.x - 1, z1.y - 1, 2, 2);
-			hDC.fillRect(z1.x - 1, z1.y - 1, 2, 2);
-		//	}
+			if (z1.on) {
+				hDC.fillStyle = color;
+				hDC.strokeRect(z1.x - 1, z1.y - 1, 2, 2);
+			} else {
+				hDC.fillStyle = "white";
+				hDC.strokeRect(z1.x - 1, z1.y - 1, 2, 2);
+				hDC.fillRect(z1.x - 1, z1.y - 1, 2, 2);
+			}
 		}
 	}
 	hDC.restore();
@@ -95,12 +98,25 @@ function randshape(n, m) {
 	return out;
 }
 
-var in1 = [[{"x": 54.440652041410274,"y": 0,"on": true}, {"x": 54.44065204141029,"y": 735,"on": true}, {"x": 74.68792686522303,"y": 735,"on": true}, {"x": 74.68792686522303,"y": 0,"on": true}, {"x": 54.440652041410274,"y": 0,"on": true}], [{"x": 62.44065204141029,"y": 735,"on": true}, {"x": 356.4406520414102,"y": 735,"on": true}, {"x": 356.4406520414102,"y": 717,"on": true}, {"x": 62.4406520414103,"y": 717,"on": true}, {"x": 62.44065204141029,"y": 735,"on": true}], [{"x": 62.440652041410274,"y": 391.2,"on": true}, {"x": 300.7006520414102,"y": 391.2,"on": true}, {"x": 300.7006520414102,"y": 373.2,"on": true}, {"x": 62.4406520414103,"y": 373.2,"on": true}, {"x": 62.440652041410274,"y": 391.2,"on": true}], [{"x": 64.56428945331668,"y": 717,"on": true}, {"x": -19.166156285582375,"y": 717,"on": true}, {"x": -22.340041938334736,"y": 735,"on": true}, {"x": 64.56428945331666,"y": 735,"on": true}, {"x": 64.56428945331668,"y": 717,"on": true}], [{"x": 151.4686208449681,"y": 0,"on": true}, {"x": -18.531379155031914,"y": 0,"on": true}, {"x": -21.705264807784282,"y": 18,"on": true}, {"x": 148.2947351922157,"y": 18,"on": true}, {"x": 151.4686208449681,"y": 0,"on": true}], [{"x": 356.4406520414103,"y": 735,"on": true}, {"x": 356.4406520414102,"y": 590,"on": true}, {"x": 336.19337721759746,"y": 590,"on": true}, {"x": 336.1933772175976,"y": 735,"on": true}, {"x": 356.4406520414103,"y": 735,"on": true}], [{"x": 62.44065204141027,"y": 18,"on": true}, {"x": 356.4406520414102,"y": 18,"on": true}, {"x": 356.4406520414102,"y": 0,"on": true}, {"x": 62.440652041410274,"y": 0,"on": true}, {"x": 62.44065204141027,"y": 18,"on": true}], [{"x": 64.56428945331666,"y": 0,"on": true}, {"x": -18.5313791550319,"y": 0,"on": true}, {"x": -21.705264807784268,"y": 18,"on": true}, {"x": 64.56428945331666,"y": 18,"on": true}, {"x": 64.56428945331666,"y": 0,"on": true}], [{"x": 336.1933772175976,"y": 0,"on": true}, {"x": 336.1933772175975,"y": 145,"on": true}, {"x": 356.44065204141026,"y": 145,"on": true}, {"x": 356.4406520414103,"y": 0,"on": true}, {"x": 336.1933772175976,"y": 0,"on": true}]];
+var in1 = [[
+	{ "x": 818, "y": 928, "on": true },
+	{ "x": 490.58167701305132, "y": 928, "on": false },
+	{ "x": 119.36605542567935, "y": 789.56922252138634, "on": false },
+	{ "x": -43.128428624165792, "y": 598.83193769835407, "on": true },
+],
+[
+	{ "x": -264.0, "y": -98.0, "on": true },
+	{ "x": -264.0, "y": 211.28227904194409, "on": false },
+	{ "x": -142.41574982367075, "y": 518.24809985172965, "on": false },
+	{ "x": 56.865397392878748, "y": 700.49092773837606, "on": true },
+],
+];;
 var in2 = randshape(3, 15);
-drawShape(hDC, in1, "blue", "rgba(255, 0, 0, 0.05)");
-drawShape(hDC, in2, "transparent", "rgba(0, 255, 0, 0.05)");
-debugger;
-var result = lib.removeOverlap(in1, 1, 1000);
+//drawShape(hDC, in1, "blue", "rgba(255, 0, 0, 0.05)");
+//drawShape(hDC, in2, "transparent", "rgba(0, 255, 0, 0.05)");
+//debugger;
+var result = lib.removeOverlap(in1, 1, 100000);
+console.log(JSON.stringify(result));
 // var result = lib.boole(1, in1, in2, 1, 1);
 drawShape(hDC, result, "black", "transparent");
 
@@ -276,10 +292,10 @@ function ccolinear(c1, c2, threshold) {
 function pairIteration(c1, c2, curveIntersectionThreshold, depth, results) {
 	var c1b = bboxof(c1), c2b = bboxof(c2), r = 100000, threshold = curveIntersectionThreshold || 0.5;
 	if (!bboxOverlap(c1b, c2b)) return results;
-	if (c1b.x.size < threshold && c2b.x.size < threshold) return results;
-	if (c1b.y.size < threshold && c2b.y.size < threshold) return results;
-	if (c1._linear && c2._linear && ccolinear(c1, c2, threshold)) return results;
-	if (depth > 8 || c1b.x.size < threshold && c1b.y.size < threshold || c2b.x.size < threshold && c2b.y.size < threshold) {
+	//	if (c1b.x.size < threshold && c2b.x.size < threshold) return results;
+	//	if (c1b.y.size < threshold && c2b.y.size < threshold) return results;
+	if (c1._linear && c2._linear) return results;
+	if (depth > 20 || c1b.x.size < threshold && c1b.y.size < threshold || c2b.x.size < threshold && c2b.y.size < threshold) {
 		results.push([((r * (c1._t1 + c1._t2) / 2) | 0) / r, ((r * (c2._t1 + c2._t2) / 2) | 0) / r]);
 		return results;
 	}

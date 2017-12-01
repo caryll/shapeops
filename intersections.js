@@ -1,5 +1,7 @@
 "use strict";
 
+const curveIntersections = require("./curve-intersection");
+
 // Cache bounding boxes
 function bez3bbox(x0, y0, x1, y1, x2, y2, x3, y3) {
 	let tvalues = [],
@@ -96,37 +98,35 @@ function bboxOverlap(b1, b2) {
 	return true;
 }
 
-const PHI = 1 / 2;
-const MAX_DEPTH = 20;
-
 function pairIteration(c1, c2, curveIntersectionThreshold, depth, results) {
-	let c1b = bboxof(c1),
-		c2b = bboxof(c2),
-		threshold = curveIntersectionThreshold || 0.5;
-	if (!bboxOverlap(c1b, c2b)) return results;
-	//	if (c1b.x.size < threshold && c2b.x.size < threshold) return results;
-	//	if (c1b.y.size < threshold && c2b.y.size < threshold) return results;
 	if (c1._linear && c2._linear) return results;
-	if (
-		depth > MAX_DEPTH ||
-		(c1b.x.size < threshold && c1b.y.size < threshold) ||
-		(c2b.x.size < threshold && c2b.y.size < threshold)
-	) {
-		const intersectionX = (c1b.x.mid + c2b.x.mid) / 2;
-		const intersectionY = (c1b.y.mid + c2b.y.mid) / 2;
 
-		results.push([
-			{ t: (c1._t1 + c1._t2) / 2, x: intersectionX, y: intersectionY },
-			{ t: (c2._t1 + c2._t2) / 2, x: intersectionX, y: intersectionY }
-		]);
-		return results;
+	const intersections = curveIntersections(
+		[
+			c1.points[0].x,
+			c1.points[0].y,
+			c1.points[1].x,
+			c1.points[1].y,
+			c1.points[2].x,
+			c1.points[2].y,
+			c1.points[3].x,
+			c1.points[3].y
+		],
+		[
+			c2.points[0].x,
+			c2.points[0].y,
+			c2.points[1].x,
+			c2.points[1].y,
+			c2.points[2].x,
+			c2.points[2].y,
+			c2.points[3].x,
+			c2.points[3].y
+		]
+	);
+
+	for (let [t1, [x1, y1], t2, [x2, y2]] of intersections) {
+		results.push([{ t: c1._t1 + t1, x: x1, y: y1 }, { t: c2._t1 + t2, x: x2, y: y2 }]);
 	}
-	let cc1 = c1.split(PHI),
-		cc2 = c2.split(PHI);
-	pairIteration(cc1.left, cc2.left, threshold, depth + 1, results);
-	pairIteration(cc1.right, cc2.left, threshold, depth + 1, results);
-	pairIteration(cc1.left, cc2.right, threshold, depth + 1, results);
-	pairIteration(cc1.right, cc2.right, threshold, depth + 1, results);
 	return results;
 }
 function curveIntersects(c1, c2, curveIntersectionThreshold) {

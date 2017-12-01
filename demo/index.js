@@ -178,7 +178,7 @@ let in2 = randshape(1, 10);
 //drawShape(hDC, in1, "blue", "rgba(255, 0, 0, 0.05)");
 //drawShape(hDC, in2, "green", "transparent");
 //debugger;
-let result = lib.removeOverlap(in1, 1, 100);
+let result = lib.removeOverlap(in2, 1, 100);
 //console.log(JSON.stringify(result));
 //let result = lib.boole(1, in1, in2, 1, 1);
 drawShape(hDC, result, "black", "rgba(0, 255, 0, 0.05)");

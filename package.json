@@ -1,7 +1,7 @@
 {
   "name": "caryll-shapeops",
   "description": "Boolean operations and overlap removal for curves.",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "dependencies": {
     "bezier-js": "^2.2.1",
     "clipper-lib": "^1.0.0"
